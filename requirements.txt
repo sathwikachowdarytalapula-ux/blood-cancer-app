@@ -1,7 +1,6 @@
 flask
 numpy
 opencv-python
-tensorflow==2.15.0
 matplotlib
 gunicorn
 pillow
