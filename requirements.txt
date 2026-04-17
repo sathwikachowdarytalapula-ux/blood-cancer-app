@@ -1,7 +1,7 @@
 flask
-numpy
+numpy==1.24.4
 opencv-python
 matplotlib
 gunicorn
 pillow
-tensorflow==2.15.0
+tensorflow-cpu==2.15.0

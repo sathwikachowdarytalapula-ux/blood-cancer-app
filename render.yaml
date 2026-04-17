@@ -3,7 +3,7 @@ services:
     name: blood-cancer-app
     env: python
     region: oregon
+    plan: free
     buildCommand: pip install -r requirements.txt
     startCommand: gunicorn app:app
-    plan: free
-    pythonVersion: 3.10.13
+    runtime: python-3.10.13
