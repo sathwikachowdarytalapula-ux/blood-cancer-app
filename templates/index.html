@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Blood Cancer Detection</title>
+    <style>
+        body {
+            font-family: Arial;
+            text-align: center;
+            background: #0f172a;
+            color: white;
+        }
+
+        h1 {
+            margin-top: 40px;
+        }
+
+        .box {
+            background: #1e293b;
+            padding: 30px;
+            margin: 50px auto;
+            width: 450px;
+            border-radius: 15px;
+            box-shadow: 0px 0px 25px rgba(0,0,0,0.6);
+        }
+
+        input, button {
+            margin: 10px;
+            padding: 10px;
+            border-radius: 8px;
+        }
+
+        button {
+            background: #22c55e;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        button:hover {
+            background: #16a34a;
+        }
+
+        h2 {
+            margin-top: 20px;
+        }
+
+        img {
+            margin-top: 15px;
+            max-width: 100%;
+            border-radius: 10px;
+        }
+
+        .bar-container {
+            width: 100%;
+            background: #334155;
+            border-radius: 10px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+
+        .bar {
+            padding: 10px;
+            border-radius: 10px;
+            color: white;
+            font-weight: bold;
+        }
+
+        .normal {
+            background: #22c55e;
+        }
+
+        .leukemia {
+            background: #ef4444;
+        }
+
+        .section {
+            margin-top: 25px;
+        }
+
+        .title-small {
+            font-size: 14px;
+            color: #94a3b8;
+        }
+    </style>
+</head>
+<body>
+
+<h1>🩸 Blood Cancer Detection</h1>
+
+<div class="box">
+
+    <form method="post" enctype="multipart/form-data">
+        <input type="file" name="file" required>
+        <br>
+        <button type="submit">Analyze</button>
+    </form>
+
+    {% if image %}
+        <div class="section">
+            <h3>Uploaded Image</h3>
+            <img src="{{ image }}">
+        </div>
+    {% endif %}
+
+    {% if result %}
+        <div class="section">
+            <h2>{{ result }}</h2>
+
+            <p>Confidence: {{ confidence }}%</p>
+
+            <div class="bar-container">
+                <div class="bar {% if confidence > 50 %}leukemia{% else %}normal{% endif %}"
+                     style="width: {{ confidence }}%;">
+                    {{ confidence }}%
+                </div>
+            </div>
+        </div>
+
+        <!-- 🔥 PROBABILITY BREAKDOWN -->
+        <div class="section">
+            <h3>Prediction Analysis</h3>
+
+            <p class="title-small">Normal Probability</p>
+            <div class="bar-container">
+                <div class="bar normal" style="width: {{ normal }}%;">
+                    {{ normal }}%
+                </div>
+            </div>
+
+            <p class="title-small">Leukemia Probability</p>
+            <div class="bar-container">
+                <div class="bar leukemia" style="width: {{ leukemia }}%;">
+                    {{ leukemia }}%
+                </div>
+            </div>
+        </div>
+
+        <!-- 🔥 PIE CHART (NEW) -->
+        {% if chart %}
+        <div class="section">
+            <h3>Prediction Chart</h3>
+            <img src="/static/{{ chart }}">
+        </div>
+        {% endif %}
+
+    {% endif %}
+
+    <!-- TRAINING GRAPH -->
+    <div class="section">
+        <h3>Training Accuracy</h3>
+        <img src="/static/accuracy.png">
+    </div>
+
+</div>
+
+</body>
+</html>
