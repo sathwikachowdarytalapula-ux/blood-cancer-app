@@ -1,27 +1,39 @@
 from flask import Flask, request, render_template
 import cv2
 import numpy as np
-from tensorflow.keras.models import load_model
 import os
 
-# 🔥 IMPORTANT for deployment (no GUI)
+# Matplotlib (safe for server)
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
 app = Flask(__name__)
 
-# Load model safely
+# -----------------------------
+# SAFE MODEL LOADING (IMPORTANT)
+# -----------------------------
 MODEL_PATH = "model.h5"
-if not os.path.exists(MODEL_PATH):
-    raise FileNotFoundError("model.h5 not found!")
+model = None
 
-model = load_model(MODEL_PATH)
+try:
+    from tensorflow.keras.models import load_model
+
+    if os.path.exists(MODEL_PATH):
+        model = load_model(MODEL_PATH)
+        print("Model loaded successfully")
+    else:
+        print("model.h5 not found")
+
+except Exception as e:
+    print("TensorFlow/Model loading failed:", e)
+
 
 # Upload folder
 app.config['UPLOAD_FOLDER'] = 'static/uploads'
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 os.makedirs("static", exist_ok=True)
+
 
 @app.route("/", methods=["GET", "POST"])
 def index():
@@ -33,15 +45,30 @@ def index():
     chart = None
 
     if request.method == "POST":
+
+        # -----------------------------
+        # CHECK MODEL FIRST (PREVENT CRASH)
+        # -----------------------------
+        if model is None:
+            return render_template(
+                "index.html",
+                result="❌ Model not loaded on server",
+                confidence=None,
+                image=None,
+                leukemia=None,
+                normal=None,
+                chart=None
+            )
+
         file = request.files.get("file")
 
         if file and file.filename != "":
+
             filepath = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
             file.save(filepath)
 
             image_path = filepath.replace("static/", "")
 
-            # Read image
             img = cv2.imread(filepath)
 
             if img is None:
@@ -69,7 +96,7 @@ def index():
                 result = "✅ Normal"
                 confidence_percent = normal_percent
 
-            # 🔥 PIE CHART
+            # PIE CHART
             labels = ['Normal', 'Leukemia']
             sizes = [normal_percent, leukemia_percent]
 
@@ -93,6 +120,9 @@ def index():
         chart=chart
     )
 
-# 🚀 REQUIRED FOR RENDER
+
+# -----------------------------
+# RENDER ENTRY POINT
+# -----------------------------
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=10000)
