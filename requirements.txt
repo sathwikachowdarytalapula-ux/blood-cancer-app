@@ -4,3 +4,4 @@ opencv-python
 matplotlib
 gunicorn
 pillow
+tensorflow==2.15.0
